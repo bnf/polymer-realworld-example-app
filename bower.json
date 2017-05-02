@@ -1,0 +1,12 @@
+{
+  "name": "polymer-realworld-example-app",
+  "description": "Polymer codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the RealWorld spec and API",
+  "main": "index.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0-rc.3"
+  },
+  "devDependencies": {
+    "web-component-tester": "^6.0.0-prerelease.5",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0-rc.7"
+  }
+}

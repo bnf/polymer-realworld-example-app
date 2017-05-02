@@ -1,0 +1,7 @@
+{
+  "name": "polymer-realworld-example-app",
+  "short_name": "polymer-realworld-example-app",
+  "description": "Polymer codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the RealWorld spec and API",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,28 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-bind.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+
+<link rel="import" href="/src/conduit-navbar/conduit-navbar.html">
+<link rel="import" href="/src/conduit-footer/conduit-footer.html">
+<link rel="import" href="/src/conduit-home/conduit-home.html">
+
+<dom-module id="conduit-app">
+  <template is="dom-bind">
+    <conduit-navbar></conduit-navbar>
+
+    <conduit-home></conduit-home>
+
+    <conduit-footer></conduit-footer>
+  </template>
+
+  <script>
+    /** @polymerElement */
+    class ConduitApp extends Polymer.Element {
+      static get is() {
+        return 'conduit-app';
+      }
+    }
+
+    window.customElements.define(ConduitApp.is, ConduitApp);
+  </script>
+</dom-module>
