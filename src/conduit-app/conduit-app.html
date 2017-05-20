@@ -1,23 +1,76 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
+<!-- Lazy load pages except home? -->
 <link rel="import" href="/src/conduit-navbar/conduit-navbar.html">
 <link rel="import" href="/src/conduit-footer/conduit-footer.html">
 <link rel="import" href="/src/conduit-home/conduit-home.html">
+<link rel="import" href="/src/conduit-settings.html">
 
 <dom-module id="conduit-app">
-  <template is="dom-bind">
+  <template>
+
+    <style>
+
+    </style>
+
+    <iron-ajax auto
+               url="https://conduit.productionready.io/api/articles"
+               handle-as="json"
+               last-response="{{articlesResponse}}"></iron-ajax>
+    <iron-ajax auto
+               url="https://conduit.productionready.io/api/tags"
+               handle-as="json"
+               last-response="{{tagsResponse}}"></iron-ajax>
+
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}"></app-route>
+
     <conduit-navbar></conduit-navbar>
 
-    <conduit-home></conduit-home>
+    <iron-pages role="main" selected="[[page]]"
+                attr-for-selected="name"
+                selected-attribute="visible"
+                fallback-selection="404">
+      <conduit-home name="home"
+                    articles="{{articlesResponse.articles}}"
+                    tags="{{tagsResponse.tags}}"></conduit-home>
+      <conduit-settings name="settings"></conduit-settings>
+    </iron-pages>
 
     <conduit-footer></conduit-footer>
   </template>
 
   <script>
-    /** @polymerElement */
     class ConduitApp extends Polymer.Element {
       static get is() {
         return 'conduit-app';
+      }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+          },
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)'
+        ];
+      }
+
+      _routePageChanged(page) {
+        this.page = page || 'home';
       }
     }
 

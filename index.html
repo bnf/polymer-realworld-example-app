@@ -1,20 +1,41 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>Conduit</title>
-    <meta name="description" content="Polymer codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the RealWorld spec and API">
+  <title>Conduit</title>
+  <meta name="description"
+        content="Polymer codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the RealWorld spec and API">
 
-    <!-- See https://goo.gl/OOhYW5 -->
-    <link rel="manifest" href="/manifest.json">
+  <!-- See https://goo.gl/OOhYW5 -->
+  <link rel="manifest" href="/manifest.json">
 
-    <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
-    <link rel="import" href="/src/conduit-app/conduit-app.html">
-  </head>
-  <body>
-    <conduit-app></conduit-app>
-  </body>
+  <!-- Import Ionicon icons & Google Fonts our Bootstrap theme relies on -->
+  <link href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=Titillium+Web:700|Source+Serif+Pro:400,700|Merriweather+Sans:400,700|Source+Sans+Pro:400,300,600,700,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+
+  <link rel="import" href="/src/conduit-app/conduit-app.html" async>
+
+  <style>
+    html {
+      font-size: 16px;
+      -ms-overflow-style: scrollbar;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: "Source Sans Pro", sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #373a3c;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+<conduit-app></conduit-app>
+</body>
 </html>
