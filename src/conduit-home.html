@@ -1,5 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
 
 <dom-module id="conduit-home">
   <template>
@@ -39,7 +38,7 @@
                     <i class="ion-heart"></i> [[item.favoritesCount]]
                   </button>
                 </div>
-                <a href="" class="preview-link">
+                <a href="/#/article/[[item.slug]]" class="preview-link">
                   <h1>[[item.title]]</h1>
                   <p>[[item.description]]</p>
                   <span>Read more...</span>
