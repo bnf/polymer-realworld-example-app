@@ -1,0 +1,16 @@
+{
+  "name": "polymer-realworld-example-app",
+  "private": true,
+  "scripts": {
+    "start": "polymer serve",
+    "build": "polymer install && polymer build",
+    "server": "prpl-server --root build"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "prpl-server": "^1.0.0",
+    "polymer-cli": "^1.5.5"
+  }
+}
