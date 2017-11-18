@@ -1,4 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/juicy-html/juicy-html.html">
 
 <dom-module id="conduit-article">
   <template>
@@ -6,29 +9,42 @@
 
     </style>
 
+    <app-route
+      route="{{route}}"
+      pattern="/:slug"
+      data="{{routeData}}"></app-route>
+    <iron-ajax auto
+      url="[[articleUrl]]"
+      handle-as="json"
+      on-response="_handleArticleResponse"></iron-ajax>
+    <iron-ajax auto
+      url="[[commentsUrl]]"
+      handle-as="json"
+      on-response="_handleCommentsResponse"></iron-ajax>
+
     <div class="article-page">
 
       <div class="banner">
         <div class="container">
 
-          <h1>How to build webapps that scale</h1>
+          <h1>[[article.title]]</h1>
 
           <div class="article-meta">
-            <a href=""><img src="http://i.imgur.com/Qr71crq.jpg"/></a>
+            <a href="/#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
             <div class="info">
-              <a href="" class="author">Eric Simons</a>
-              <span class="date">January 20th</span>
+              <a href="/#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
+              <span class="date">[[article.createdAt]]</span>
             </div>
             <button class="btn btn-sm btn-outline-secondary">
               <i class="ion-plus-round"></i>
               &nbsp;
-              Follow Eric Simons <span class="counter">(10)</span>
+              Follow [[article.author.username]]
             </button>
             &nbsp;&nbsp;
             <button class="btn btn-sm btn-outline-primary">
               <i class="ion-heart"></i>
               &nbsp;
-              Favorite Post <span class="counter">(29)</span>
+              Favorite Post <span class="counter">([[article.favoritesCount]])</span>
             </button>
           </div>
 
@@ -39,11 +55,14 @@
 
         <div class="row article-content">
           <div class="col-md-12">
-            <p>
-              Web development technologies have evolved at an incredible clip over the past few years.
-            </p>
-            <h2 id="introducing-ionic">Introducing RealWorld.</h2>
-            <p>It's a great solution for learning how other frameworks work.</p>
+            <div>
+              <template is="juicy-html" html="{{article.body}}"></template>
+            </div>
+            <ul class="tag-list">
+              <template is="dom-repeat" items="[[article.tagList]]">
+                <li class="tag-default tag-pill tag-outline">[[item]]</li>
+              </template>
+            </ul>
           </div>
         </div>
 
@@ -51,22 +70,22 @@
 
         <div class="article-actions">
           <div class="article-meta">
-            <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg"/></a>
+            <a href="/#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
             <div class="info">
-              <a href="" class="author">Eric Simons</a>
-              <span class="date">January 20th</span>
+              <a href="/#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
+              <span class="date">[[article.createdAt]]</span>
             </div>
 
             <button class="btn btn-sm btn-outline-secondary">
               <i class="ion-plus-round"></i>
               &nbsp;
-              Follow Eric Simons <span class="counter">(10)</span>
+              Follow [[article.author.username]]
             </button>
             &nbsp;
             <button class="btn btn-sm btn-outline-primary">
               <i class="ion-heart"></i>
               &nbsp;
-              Favorite Post <span class="counter">(29)</span>
+              Favorite Post <span class="counter">([[article.favoritesCount]])</span>
             </button>
           </div>
         </div>
@@ -87,44 +106,25 @@
               </div>
             </form>
 
-            <div class="card">
-              <div class="card-block">
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <template is="dom-repeat" items="[[comments]]">
+              <div class="card">
+                <div class="card-block">
+                  <p class="card-text">[[item.body]]</p>
+                </div>
+                <div class="card-footer">
+                  <a href="/#/profile/[[item.author.username]]" class="comment-author">
+                    <img src="[[item.author.image]]" class="comment-author-img"/>
+                  </a>
+                  &nbsp;
+                  <a href="/#/profile/[[item.author.username]]" class="comment-author">[[item.author.username]]</a>
+                  <span class="date-posted">[[item.createdAt]]</span>
+                </div>
               </div>
-              <div class="card-footer">
-                <a href="" class="comment-author">
-                  <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img"/>
-                </a>
-                &nbsp;
-                <a href="" class="comment-author">Jacob Schmidt</a>
-                <span class="date-posted">Dec 29th</span>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-block">
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              </div>
-              <div class="card-footer">
-                <a href="" class="comment-author">
-                  <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img"/>
-                </a>
-                &nbsp;
-                <a href="" class="comment-author">Jacob Schmidt</a>
-                <span class="date-posted">Dec 29th</span>
-                <span class="mod-options">
-              <i class="ion-edit"></i>
-              <i class="ion-trash-a"></i>
-            </span>
-              </div>
-            </div>
+            </template>
 
           </div>
-
         </div>
-
       </div>
-
     </div>
   </template>
 
@@ -132,6 +132,63 @@
     class ConduitArticle extends Polymer.Element {
       static get is() {
         return 'conduit-article';
+      }
+      static get properties() {
+        return {
+          visible: {
+            type: Boolean,
+            value: false
+          },
+          route: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          routeData: Object,
+          article: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          comments: {
+            type: Array,
+            value: function () {
+              return []
+            }
+          },
+          articleUrl: {
+            type: String,
+            value: null,
+            computed: '_computeArticleUrl(visible, routeData.slug)',
+          },
+          commentsUrl: {
+            type: String,
+            value: null,
+            computed: '_computeCommentsUrl(visible, routeData.slug)',
+          },
+        };
+      }
+      _handleArticleResponse(data) {
+        if (data.detail.response && 'article' in data.detail.response) {
+          this.set('article', data.detail.response.article)
+        }
+        console.log(data.detail.response)
+      }
+      _handleCommentsResponse(data) {
+        if (data.detail.response && 'comments' in data.detail.response) {
+          this.set('comments', data.detail.response.comments)
+        }
+        console.log(data.detail.response)
+      }
+      _computeArticleUrl(visible, slug) {
+        if (!visible) return null;
+        return 'https://conduit.productionready.io/api/articles/' + slug;
+      }
+      _computeCommentsUrl(visible, slug) {
+        if (!visible) return null;
+        return 'https://conduit.productionready.io/api/articles/' + slug + '/comments';
       }
     }
 
