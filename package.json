@@ -4,6 +4,7 @@
   "scripts": {
     "start": "polymer serve",
     "build": "polymer install && polymer build",
+    "heroku-postbuild": "npm run build",
     "server": "prpl-server --root build"
   },
   "engines": {
