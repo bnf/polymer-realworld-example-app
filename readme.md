@@ -20,6 +20,13 @@ For more information on how to this works with other frontends/backends, head ov
 
 First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
 
+
+## Install dependencies
+
+```
+$ polymer install
+```
+
 ## Viewing the application
 
 ```
