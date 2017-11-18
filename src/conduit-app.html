@@ -12,6 +12,7 @@
 <link rel="import" href="conduit-auth.html">
 <link rel="import" href="conduit-editor.html">
 <link rel="import" href="conduit-article.html">
+<link rel="import" href="conduit-profile.html">
 
 <dom-module id="conduit-app">
   <template>
@@ -54,6 +55,8 @@
       <conduit-editor name="editor"></conduit-editor>
 
       <conduit-article name="article" route="{{subroute}}"></conduit-article>
+
+      <conduit-profile name="profile" route="{{subroute}}"></conduit-profile>
 
       <conduit-404 name="404"></conduit-404>
     </iron-pages>

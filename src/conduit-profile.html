@@ -1,0 +1,146 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="conduit-article-preview.html">
+
+<dom-module id="conduit-profile">
+  <template>
+    <style>
+    </style>
+    <app-route
+      route="{{route}}"
+      pattern="/:slug"
+      data="{{routeData}}"
+      tail="{{subRoute}}"></app-route>
+
+    <iron-ajax auto
+      url="[[profileUrl]]"
+      handle-as="json"
+      on-response="handleProfileResponse"></iron-ajax>
+    <iron-ajax auto
+      url="[[articlesUrl]]"
+      handle-as="json"
+      on-response="handleArticlesResponse"></iron-ajax>
+
+    <div class="profile-page">
+
+      <div class="user-info">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12 col-md-10 offset-md-1">
+              <img src="[[user.image]]" class="user-img" alt="[[user.username]]"/>
+              <h4>[[user.username]]</h4>
+              <p>[[user.bio]]</p>
+              <button class="btn btn-sm btn-outline-secondary action-btn">
+                <i class="ion-plus-round"></i>
+                &nbsp;
+                Follow [[user.username]]
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row">
+
+          <div class="col-xs-12 col-md-10 offset-md-1">
+            <div class="articles-toggle">
+              <ul class="nav nav-pills outline-active">
+                <li class="nav-item">
+                  <a class$="[[computeTabClass(subRoute.path, '')]]" href="[[rootPath]]#/profile/[[user.username]]">My Posts</a>
+                </li>
+                <li class="nav-item">
+                  <a class$="[[computeTabClass(subRoute.path, '/favorites')]]" href="[[rootPath]]#/profile/[[user.username]]/favorites">Favorited Posts</a>
+                </li>
+              </ul>
+            </div>
+
+            <template is="dom-repeat" items="[[articles]]">
+              <conduit-article-preview article="[[item]]"/>
+            </template>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </template>
+
+  <script>
+    class ConduitProfile extends Polymer.Element {
+      static get is() {
+        return 'conduit-profile';
+      }
+      static get properties() {
+        return {
+          visible: {
+            type: Boolean,
+            value: false
+          },
+          route: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          routeData: Object,
+          subRoute: Object,
+          user: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          profileUrl: {
+            type: String,
+            value: null,
+            computed: 'computeProfileUrl(visible, routeData.slug)'
+          },
+          articlesUrl: {
+            type: String,
+            value: null,
+            computed: 'computeArticlesUrl(visible, routeData.slug, subRoute.path)'
+          },
+          articles: {
+            type: Array
+          },
+        };
+      }
+      handleArticlesResponse(data) {
+        if (data.detail.response && 'articles' in data.detail.response) {
+          this.set('articles', data.detail.response.articles)
+        }
+        console.log(data.detail.response)
+      }
+      handleProfileResponse(data) {
+        if (data.detail.response && 'profile' in data.detail.response) {
+          this.set('user', data.detail.response.profile)
+        }
+        console.log(data.detail.response)
+      }
+      computeProfileUrl(visible, username) {
+        if (!visible) {
+          return null;
+        }
+        return 'https://conduit.productionready.io/api/profiles/' + username;
+      }
+      computeArticlesUrl(visible, username, path) {
+        if (!visible) {
+          return null;
+        }
+        if (path === '/favorites') {
+          return 'https://conduit.productionready.io/api/articles/?favorited=' + username;
+        }
+        return 'https://conduit.productionready.io/api/articles/?author=' + username;
+      }
+      computeTabClass(currentPath, element) {
+        if (currentPath === element) {
+          return 'nav-link active';
+        }
+        return 'nav-link';
+      }
+    }
+
+    window.customElements.define(ConduitProfile.is, ConduitProfile);
+  </script>
+</dom-module>
