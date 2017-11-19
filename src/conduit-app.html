@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
 <!-- Lazy load pages except home? -->
@@ -70,12 +70,26 @@
 
       static get observers() {
         return [
-          '_routePageChanged(routeData.page)'
+          '_routePageChanged(routeData.page, isAttached)',
         ];
       }
 
-      _routePageChanged(page) {
+      connectedCallback() {
+        super.connectedCallback();
+        this.isAttached = true;
+      }
+
+      _routePageChanged(page, isAttached) {
+        if (!isAttached) {
+          return;
+        }
         this.page = page || 'home';
+
+        // Scroll to the top of the page on every *route* change. Use `Polymer.AppLayout.scroll`
+        // with `behavior: 'silent'` to disable header scroll effects during the scroll.
+        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+        // Close the drawer - in case the *route* change came from a link in the drawer.
+        //this.$.nav.closeDrawer();
       }
     }
 
