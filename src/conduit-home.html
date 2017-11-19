@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/pagination-input/pagination-input.html">
 <link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="conduit-article-preview.html">
 
 <dom-module id="conduit-home">
   <template>
@@ -50,23 +51,7 @@
             </div>
 
             <template is="dom-repeat" items="[[articles]]">
-              <div class="article-preview">
-                <div class="article-meta">
-                  <a href="[[rootPath]]#/profile/[[item.author.username]]"><img src="[[item.author.image]]"/></a>
-                  <div class="info">
-                    <a href="[[rootPath]]#/profile/[[item.author.username]]" class="author">[[item.author.username]]</a>
-                    <span class="date">[[item.createdAt]]</span>
-                  </div>
-                  <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i class="ion-heart"></i> [[item.favoritesCount]]
-                  </button>
-                </div>
-                <a href="[[rootPath]]#/article/[[item.slug]]" class="preview-link">
-                  <h1>[[item.title]]</h1>
-                  <p>[[item.description]]</p>
-                  <span>Read more...</span>
-                </a>
-              </div>
+              <conduit-article-preview article="[[item]]"/>
             </template>
             <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
           </div>
