@@ -26,6 +26,11 @@
       <a href="/#/article/[[article.slug]]" class="preview-link">
         <h1>[[article.title]]</h1>
         <p>[[article.description]]</p>
+        <ul class="tag-list">
+          <template is="dom-repeat" items="[[article.tagList]]">
+            <li class="tag-pill tag-default tag-outline">[[item]]</a>
+          </template>
+        </ul>
         <span>Read more...</span>
       </a>
     </div>
