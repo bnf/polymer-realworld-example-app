@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
 
 <dom-module id="conduit-auth">
   <template>
@@ -18,29 +19,55 @@
         <div class="row">
 
           <div class="col-md-6 offset-md-3 col-xs-12">
-            <h1 class="text-xs-center">Sign up</h1>
+            <h1 class="text-xs-center">
+              <template is="dom-if" if="[[isRegistration]]">
+                Sign up
+              </template>
+              <template is="dom-if" if="[[!isRegistration]]">
+                Sign in
+              </template>
+            </h1>
             <p class="text-xs-center">
-              <a href="">Have an account?</a>
+              <template is="dom-if" if="[[isRegistration]]">
+                <a href="/#/login">Have an account?</a>
+              </template>
+              <template is="dom-if" if="[[!isRegistration]]">
+                <a href="/#/register">Need an account?</a>
+              </template>
             </p>
 
-            <ul class="error-messages">
-              <li>That email is already taken</li>
-            </ul>
+            <template is="dom-if" if="{{errors}}">
+              <ul class="error-messages">
+                <template is="dom-repeat" items="{{_toArray(errors)}}">
+                  <li>[[item.name]] [[item.value]]</li>
+                </template>
+              </ul>
+            </template>
 
-            <form>
-              <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="text" placeholder="Your Name">
-              </fieldset>
-              <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="text" placeholder="Email">
-              </fieldset>
-              <fieldset class="form-group">
-                <input class="form-control form-control-lg" type="password" placeholder="Password">
-              </fieldset>
-              <button class="btn btn-lg btn-primary pull-xs-right">
-                Sign up
-              </button>
-            </form>
+            <iron-form id="auth-form" on-iron-form-presubmit="_presubmit"
+              on-iron-form-response="_handleFormResponse" on-iron-form-error="_handleErrorResponse">
+              <form action="[[formUrl]]" method="POST" enctype="application/json">
+                <template is="dom-if" if="[[isRegistration]]">
+                  <fieldset class="form-group">
+                    <input class="form-control form-control-lg" type="text" placeholder="Username" name="username">
+                  </fieldset>
+                </template>
+                <fieldset class="form-group">
+                  <input class="form-control form-control-lg" type="text" placeholder="Email" name="email">
+                </fieldset>
+                <fieldset class="form-group">
+                  <input class="form-control form-control-lg" type="password" id="password" placeholder="Password" name="password">
+                </fieldset>
+                <button class="btn btn-lg btn-primary pull-xs-right">
+                  <template is="dom-if" if="[[isRegistration]]">
+                    Sign up
+                  </template>
+                  <template is="dom-if" if="[[!isRegistration]]">
+                    Sign in
+                  </template>
+                </button>
+              </form>
+            </iron-form>
           </div>
 
         </div>
@@ -52,6 +79,81 @@
     class ConduitAuth extends Polymer.Element {
       static get is() {
         return 'conduit-auth';
+      }
+      static get properties() {
+        return {
+          name: {
+            type: String,
+            notify: true
+          },
+          isRegistration: {
+            type: Boolean,
+            computed: '_computeIsRegistration(name)',
+            value: false
+          },
+          formUrl: {
+            type: String,
+            computed: '_computeFormUrl(isRegistration)',
+          },
+          visible: {
+            type: Boolean,
+            value: false
+          },
+          errors: {
+            type: Object,
+            value: function() { return {}; }
+          },
+          token: {
+            type: String,
+            notify: true
+          },
+          route: {
+            type: Object,
+            notify: true
+          },
+        }
+      }
+      _computeIsRegistration(name) {
+        return name === 'register';
+      }
+      _computeFormUrl(isRegistration) {
+        return 'https://conduit.productionready.io/api/users' + (isRegistration ? '' : '/login')
+      }
+      _presubmit(e) {
+        var body = this.$['auth-form'].request.body;
+        this.$['auth-form'].request.body = { user: body };
+        console.log('body', body);
+      }
+      _handleFormResponse(e) {
+        console.log(e);
+        console.log(e.detail.response)
+        if (e.detail.response && 'user' in e.detail.response) {
+          var user = e.detail.response.user;
+          this.set('token', user.token);
+
+          this.set('errors', {})
+          console.log(user);
+          this.$.password.value = '';
+          this.set('route.path', '/');
+          /* We could also use history.pushState, but's using a two-way binding to the app's
+           * route is the more "clean" in terms of webcomponents */
+          //window.history.pushState({}, null, '/#/');
+          //window.dispatchEvent(new CustomEvent('location-changed'));
+        }
+      }
+      _handleErrorResponse(e) {
+        console.log(e, 'error');
+        if (e.detail.request.response && 'errors' in e.detail.request.response) {
+          this.set('errors', e.detail.request.response.errors)
+        }
+      }
+      _toArray(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            name: key,
+            value: obj[key]
+          };
+        });
       }
     }
 
