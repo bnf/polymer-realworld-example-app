@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/pagination-input/pagination-input.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
 
 <dom-module id="conduit-home">
   <template>
@@ -138,7 +139,7 @@
         ]
       }
       _onPageChange(page) {
-        console.log('page changed to: ' + page)
+        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
       }
       computeArticlesUrl(page, articlesPerPage) {
         return 'https://conduit.productionready.io/api/articles/?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
