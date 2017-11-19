@@ -29,6 +29,10 @@
       handle-as="json"
       on-response="_handleCommentsResponse"></iron-ajax>
 
+    <template is="dom-if" if="[[!article.slug]]">
+      Loading…
+    </template>
+    <template is="dom-if" if="[[article.slug]]">
     <div class="article-page">
 
       <div class="banner">
