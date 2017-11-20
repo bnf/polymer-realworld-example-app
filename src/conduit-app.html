@@ -47,7 +47,7 @@
                 fallback-selection="404">
       <conduit-home name="home" authentication-header="[[authenticationHeader]]"></conduit-home>
 
-      <conduit-settings name="settings"></conduit-settings>
+      <conduit-settings name="settings" user="{{currentUser.user}}"></conduit-settings>
 
       <conduit-auth name="register" token="{{token}}" route="{{route}}"></conduit-auth>
       <conduit-auth name="login" token="{{token}}" route="{{route}}"></conduit-auth>
