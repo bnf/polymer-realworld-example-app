@@ -23,36 +23,47 @@
             <form>
               <fieldset>
                 <fieldset class="form-group">
-                  <input class="form-control" type="text" placeholder="URL of profile picture">
+                  <input class="form-control" type="text" placeholder="URL of profile picture" value="[[user.image]]">
                 </fieldset>
                 <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="text" placeholder="Your Name">
+                  <input class="form-control form-control-lg" type="text" placeholder="Username" value="[[user.username]]">
                 </fieldset>
                 <fieldset class="form-group">
-                  <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you"></textarea>
+                  <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you">[[user.bio]]</textarea>
                 </fieldset>
                 <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="text" placeholder="Email">
+                  <input class="form-control form-control-lg" type="text" placeholder="Email" value="[[user.email]]">
                 </fieldset>
                 <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="password" placeholder="Password">
+                  <input class="form-control form-control-lg" type="password" placeholder="New Password">
                 </fieldset>
                 <button class="btn btn-lg btn-primary pull-xs-right">
                   Update Settings
                 </button>
               </fieldset>
             </form>
+            <hr>
+            <button class="btn btn-outline-danger">
+              Or click here to logout.
+            </button>
           </div>
 
         </div>
       </div>
-    </div>{
+    </div>
   </template>
 
   <script>
     class ConduitSettings extends Polymer.Element {
       static get is() {
         return 'conduit-settings';
+      }
+      static get properties() {
+        return {
+          user: {
+            notify: true, type: Object
+          }
+        }
       }
     }
 
