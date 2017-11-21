@@ -19,9 +19,16 @@
           <a href="[[rootPath]]#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
           <span class="date">[[article.createdAt]]</span>
         </div>
-        <button class="btn btn-outline-primary btn-sm pull-xs-right">
-          <i class="ion-heart"></i> [[article.favoritesCount]]
-        </button>
+        <template is="dom-if" if="[[article.favorited]]">
+          <button class="btn btn-primary btn-sm pull-xs-right">
+            <i class="ion-heart"></i> [[article.favoritesCount]]
+          </button>
+        </template>
+        <template is="dom-if" if="[[!article.favorited]]">
+          <button class="btn btn-outline-primary btn-sm pull-xs-right">
+            <i class="ion-heart"></i> [[article.favoritesCount]]
+          </button>
+        </template>
       </div>
       <a href="[[rootPath]]#/article/[[article.slug]]" class="preview-link">
         <h1>[[article.title]]</h1>
