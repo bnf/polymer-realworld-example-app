@@ -1,4 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-editor">
@@ -6,31 +9,54 @@
     <style include="conduit-common-styles">
     </style>
 
+    <app-route
+      route="{{route}}"
+      pattern="/:slug"
+      data="{{routeData}}"></app-route>
+
+    <iron-ajax
+      auto
+      url="[[articleUrl]]"
+      handle-as="json"
+      headers="[[authenticationHeader]]"
+      on-response="_handleArticleResponse"></iron-ajax>
+
     <div class="editor-page">
       <div class="container page">
         <div class="row">
 
           <div class="col-md-10 offset-md-1 col-xs-12">
-            <form>
-              <fieldset>
-                <fieldset class="form-group">
-                  <input type="text" class="form-control form-control-lg" placeholder="Article Title">
+            <template is="dom-if" if="{{errors}}">
+              <ul class="error-messages">
+                <template is="dom-repeat" items="{{_toArray(errors)}}">
+                  <li>[[item.name]] [[item.value]]</li>
+                </template>
+              </ul>
+            </template>
+
+            <iron-form id="article-form" on-iron-form-presubmit="_presubmit" headers="[[authenticationHeader]]"
+              on-iron-form-response="_handleFormResponse" on-iron-form-error="_handleErrorResponse">
+              <form action="[[formUrl]]" method="[[method]]" enctype="application/json">
+                <fieldset>
+                  <fieldset class="form-group">
+                    <input type="text" class="form-control form-control-lg" placeholder="Article Title" name="title" value="[[article.title]]">
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <input type="text" class="form-control" placeholder="What's this article about?" name="description" value="[[article.description]]">
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)" name="body" value="[[article.body]]"></textarea>
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <input type="text" class="form-control" placeholder="Enter tags" name="tagList" value="[[_join(article.tagList)]]">
+                    <div class="tag-list"></div>
+                  </fieldset>
+                  <button class="btn btn-lg pull-xs-right btn-primary" type="submit">
+                    Publish Article
+                  </button>
                 </fieldset>
-                <fieldset class="form-group">
-                  <input type="text" class="form-control" placeholder="What's this article about?">
-                </fieldset>
-                <fieldset class="form-group">
-                  <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)"></textarea>
-                </fieldset>
-                <fieldset class="form-group">
-                  <input type="text" class="form-control" placeholder="Enter tags">
-                  <div class="tag-list"></div>
-                </fieldset>
-                <button class="btn btn-lg pull-xs-right btn-primary" type="button">
-                  Publish Article
-                </button>
-              </fieldset>
-            </form>
+              </form>
+            </iron-form>
           </div>
 
         </div>
@@ -42,6 +68,144 @@
     class ConduitEditor extends Polymer.Element {
       static get is() {
         return 'conduit-editor';
+      }
+      static get properties() {
+        return {
+          visible: {
+            type: Boolean,
+            value: false
+          },
+          route: {
+            type: Object,
+          },
+          article: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          authenticationHeader: {
+            type: Object
+          },
+          routeData: {
+            type: Object
+          },
+          slug: {
+            type: String,
+            computed: '_computeSlug(visible, routeData.slug, route.path)',
+          },
+          formUrl: {
+            type: String,
+            value: null,
+            computed: '_computeFormUrl(slug)',
+          },
+          method: {
+            type: String,
+            value: null,
+            computed: '_computeMethod(slug)',
+          },
+          articleUrl: {
+            type: String,
+            value: null,
+            computed: '_computeArticleUrl(slug)',
+          },
+          errors: {
+            type: Object,
+            value: function() { return {}; }
+          },
+        };
+      }
+      static get observers() {
+        return [
+          '_onSlugChange(slug)',
+        ]
+      }
+      _computeSlug(visible, slug, path) {
+        console.log(visible, slug, path, '_computeSlug')
+        /**
+         * Workaround an app-route bug that routeData.path is
+         * not updated when route.path is empty.
+         * Fix that by explictly setting our slug to empty when
+         * the path is empty.
+         * https://github.com/PolymerElements/app-route/issues/206
+         * https://github.com/PolymerElements/app-route/pull/210
+         */
+        if (!path) {
+          return '';
+        }
+
+        if (!visible || !slug) {
+          return '';
+        }
+
+        return slug;
+      }
+      _computeFormUrl(slug) {
+        if (slug) {
+          return 'https://conduit.productionready.io/api/articles/' + slug
+        }
+        return 'https://conduit.productionready.io/api/articles';
+      }
+      _computeMethod(slug) {
+        return slug ? 'PUT' : 'POST';
+      }
+      _computeArticleUrl(slug) {
+        if (!slug) return null;
+        return 'https://conduit.productionready.io/api/articles/' + slug;
+      }
+      _presubmit(e) {
+        var form = this.$['article-form'];
+        var body;
+        if (this.method === 'POST') {
+          body = form.request.body;
+        } else {
+          body = form.request.params;
+        }
+
+        body.tagList = body.tagList.split(' ');
+        form.request.params = {};
+        form.request.body = { article: body };
+        console.log(body);
+      }
+      _handleFormResponse(e) {
+        if (e.detail.response && 'article' in e.detail.response) {
+          var article = e.detail.response.article;
+          this.$['article-form'].reset();
+
+          this.set('errors', {})
+          window.history.pushState({}, null, this.rootPath + '#/article/' + article.slug);
+          window.dispatchEvent(new CustomEvent('location-changed'));
+        }
+      }
+      _handleErrorResponse(e) {
+        console.log(e, 'error');
+        if (e.detail.request.response && 'errors' in e.detail.request.response) {
+          this.set('errors', e.detail.request.response.errors)
+        }
+      }
+      _handleArticleResponse(data) {
+        if (data.detail.response && 'article' in data.detail.response) {
+          this.set('article', data.detail.response.article)
+        }
+      }
+      _onSlugChange(slug) {
+        if (!slug) {
+          this.set('article', '{}')
+        }
+      }
+      _toArray(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            name: key,
+            value: obj[key]
+          };
+        });
+      }
+      _join(tags) {
+        if (tags) {
+          return tags.join(' ');
+        }
+        return '';
       }
     }
 

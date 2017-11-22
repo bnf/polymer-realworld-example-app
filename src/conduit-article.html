@@ -18,7 +18,8 @@
       route="{{route}}"
       pattern="/:slug"
       data="{{routeData}}"></app-route>
-    <iron-ajax auto
+    <iron-ajax
+      auto="[[visible]]"
       url="[[articleUrl]]"
       handle-as="json"
       headers="[[authenticationHeader]]"
@@ -124,10 +125,7 @@
             value: false
           },
           route: {
-            type: Object,
-            value: function () {
-              return {}
-            }
+            type: Object
           },
           currentUser: {
             type: Object
