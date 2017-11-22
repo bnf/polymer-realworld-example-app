@@ -83,6 +83,10 @@
 
       static get properties() {
         return {
+          visible: {
+            type: Boolean,
+            value: false
+          },
           authenticationHeader: {
             type: Object
           },
@@ -118,7 +122,7 @@
           },
           articlesUrl: {
             type: String,
-            computed: 'computeArticlesUrl(page, articlesPerPage)'
+            computed: 'computeArticlesUrl(page, articlesPerPage, visible)'
           },
         }
       }
@@ -130,7 +134,10 @@
       _onPageChange(page) {
         Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
       }
-      computeArticlesUrl(page, articlesPerPage) {
+      computeArticlesUrl(page, articlesPerPage, visible) {
+        if (!visible) {
+          return null;
+        }
         return 'https://conduit.productionready.io/api/articles/?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
       }
       handleArticlesResponse(data) {
