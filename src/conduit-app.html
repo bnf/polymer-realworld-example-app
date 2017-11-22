@@ -52,9 +52,11 @@
       <conduit-auth name="register" token="{{token}}" route="{{route}}"></conduit-auth>
       <conduit-auth name="login" token="{{token}}" route="{{route}}"></conduit-auth>
 
-      <conduit-editor name="editor"></conduit-editor>
+      <conduit-editor name="editor" route="{{subroute}}" current-user="[[currentUser.user]]"
+        authentication-header="[[authenticationHeader]]"></conduit-editor>
 
-      <conduit-article name="article" route="{{subroute}}" current-user="[[currentUser.user]]"></conduit-article>
+      <conduit-article name="article" route="{{subroute}}" current-user="[[currentUser.user]]"
+        authentication-header="[[authenticationHeader]]"></conduit-article>
 
       <conduit-profile name="profile" route="{{subroute}}"></conduit-profile>
 
