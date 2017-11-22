@@ -12,7 +12,11 @@
 
     <iron-request id="xhr"></iron-request>
     <div class="article-meta">
-      <a href="[[rootPath]]#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
+      <a href="[[rootPath]]#/profile/[[article.author.username]]">
+        <template is="dom-if" if="[[item.author.image]]">
+          <img src="[[article.author.image]]"/>
+        </template>
+      </a>
       <div class="info">
         <a href="[[rootPath]]#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
         <span class="date">[[article.createdAt]]</span>
