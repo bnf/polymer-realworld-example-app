@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-request.html">
 
 <dom-module id="conduit-article-meta">
   <template>
@@ -15,6 +16,8 @@
         text-align: left;
       }
     </style>
+
+    <iron-request id="xhr"></iron-request>
     <div class="article-meta">
       <a href="[[rootPath]]#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
       <div class="info">
@@ -39,7 +42,7 @@
       <template is="dom-if" if="[[isOwner]]">
         <span><a class="btn btn-outline-secondary btn-sm" href="#/editor/[[article.slug]]"><i class="ion-edit"></i> Edit Article</a>
         &nbsp;
-        <button class="btn btn-outline-danger btn-sm"><i class="ion-trash-a"></i> Delete Article</button></span>
+        <button class="btn btn-outline-danger btn-sm" on-click="_deleteArticle"><i class="ion-trash-a"></i> Delete Article</button></span>
       </template>
 
     </div>
@@ -62,7 +65,25 @@
             type: Boolean,
             value: false,
           },
+          authenticationHeader: {
+            type: Object
+          },
         };
+      }
+      _deleteArticle(e) {
+        console.log(e)
+        if (!this.article.slug)
+          return;
+        this.$.xhr.send({
+          url: 'https://conduit.productionready.io/api/articles/' + this.article.slug,
+          method: 'DELETE',
+          headers: this.authenticationHeader,
+          handleAs: 'json'
+        }).then(r => {
+          console.log(r, 'delete');
+          window.history.pushState({}, null, this.rootPath + '#/');
+          window.dispatchEvent(new CustomEvent('location-changed'));
+        });
       }
     }
 
