@@ -54,7 +54,7 @@
 
       <conduit-editor name="editor"></conduit-editor>
 
-      <conduit-article name="article" route="{{subroute}}"></conduit-article>
+      <conduit-article name="article" route="{{subroute}}" current-user="[[currentUser.user]]"></conduit-article>
 
       <conduit-profile name="profile" route="{{subroute}}"></conduit-profile>
 
@@ -87,6 +87,9 @@
             type: String,
             computed: '_computeCurrentUserUrl(token)'
           },
+          currentUser: {
+            type: Object
+          }
         };
       }
 

@@ -1,0 +1,71 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="conduit-article-meta">
+  <template>
+    <!-- Import Ionicon icons & Google Fonts our Bootstrap theme relies on -->
+    <link href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Titillium+Web:700|Source+Serif+Pro:400,700|Merriweather+Sans:400,700|Source+Sans+Pro:400,300,600,700,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+    <!-- Import the custom Bootstrap 4 theme from our hosted CDN -->
+    <link rel="stylesheet" href="//demo.productionready.io/main.css">
+    <style>
+      :root {
+        box-sizing: border-box !important;
+      }
+      .info .author {
+        text-align: left;
+      }
+    </style>
+    <div class="article-meta">
+      <a href="/#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
+      <div class="info">
+        <a href="/#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
+        <span class="date">[[article.createdAt]]</span>
+      </div>
+
+      <template is="dom-if" if="[[!isOwner]]">
+        <button class="btn btn-sm btn-outline-secondary">
+          <i class="ion-plus-round"></i>
+          &nbsp;
+          Follow [[article.author.username]]
+        </button>
+        &nbsp;
+        <button class="btn btn-sm btn-outline-primary">
+          <i class="ion-heart"></i>
+          &nbsp;
+          Favorite Post <span class="counter">([[article.favoritesCount]])</span>
+        </button>
+      </template>
+
+      <template is="dom-if" if="[[isOwner]]">
+        <span><a class="btn btn-outline-secondary btn-sm" href="#/editor/[[article.slug]]"><i class="ion-edit"></i> Edit Article</a>
+        &nbsp;
+        <button class="btn btn-outline-danger btn-sm"><i class="ion-trash-a"></i> Delete Article</button></span>
+      </template>
+
+    </div>
+  </template>
+
+  <script>
+    class ConduitArticleMeta extends Polymer.Element {
+      static get is() {
+        return 'conduit-article-meta';
+      }
+      static get properties() {
+        return {
+          article: {
+            type: Object,
+            value: function () {
+              return {}
+            }
+          },
+          isOwner: {
+            type: Boolean,
+            value: false,
+          },
+        };
+      }
+    }
+
+    window.customElements.define(ConduitArticleMeta.is, ConduitArticleMeta);
+  </script>
+</dom-module>
