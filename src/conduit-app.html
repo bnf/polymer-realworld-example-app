@@ -108,6 +108,9 @@
       }
 
       _computeCurrentUserUrl(token) {
+        /* The URL is only valid if we have an authenticationHeader
+           (which is generated from the token).
+          TODO: switch to observe authenticationHeader to reflect that */
         if (!token) {
           return null;
         }
