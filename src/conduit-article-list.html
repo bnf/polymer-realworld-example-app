@@ -1,0 +1,95 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/pagination-input/pagination-input.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="conduit-article-preview.html">
+<link rel="import" href="conduit-common-styles.html">
+
+<dom-module id="conduit-article-list">
+  <template>
+    <style include="conduit-common-styles">
+    </style>
+
+    <iron-ajax
+      auto="[[loadData]]"
+      url="[[articlesUrl]]"
+      handle-as="json"
+      headers="[[authenticationHeader]]"
+      on-response="_handleArticlesResponse"></iron-ajax>
+
+    <template is="dom-repeat" items="[[articles]]">
+      <conduit-article-preview article="[[item]]"/>
+    </template>
+    <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
+  </template>
+
+  <script>
+    class ConduitArticleList extends Polymer.Element {
+      static get is() {
+        return 'conduit-article-list';
+      }
+
+      static get properties() {
+        return {
+          visible: {
+            type: Boolean,
+            value: false
+          },
+          currentUser: {
+            type: Object
+          },
+          authenticationHeader: {
+            type: Object
+          },
+          articles: {
+            type: Array
+          },
+          page: {
+            type: Number,
+            value: function () {
+              return 1
+            }
+          },
+          articlesPerPage: {
+            type: Number,
+            value: function () {
+              return 20
+            }
+          },
+          pages: {
+            type: Number,
+            value: function () {
+              return 1
+            }
+          },
+          offset: {
+            type: Number
+          },
+          articlesUrl: {
+            type: String,
+            computed: 'computeArticlesUrl(page, articlesPerPage, suffix)'
+          },
+          suffix: {
+            type: String,
+            value: ''
+          },
+        }
+      }
+      computeArticlesUrl(page, articlesPerPage, suffix) {
+        return 'https://conduit.productionready.io/api/articles' + suffix + '?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
+      }
+      _handleArticlesResponse(data) {
+        if ('articles' in data.detail.response) {
+          this.set('articles', data.detail.response.articles)
+          console.log(this.get('articles'))
+        }
+        if ('articlesCount' in data.detail.response) {
+          this.set('pages', Math.ceil(data.detail.response.articlesCount / 10))
+          console.log(this.get('pages'))
+        }
+      }
+    }
+
+    window.customElements.define(ConduitArticleList.is, ConduitArticleList);
+  </script>
+</dom-module>

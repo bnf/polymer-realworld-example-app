@@ -45,7 +45,8 @@
                 attr-for-selected="name"
                 selected-attribute="visible"
                 fallback-selection="404">
-      <conduit-home name="home" authentication-header="[[authenticationHeader]]"></conduit-home>
+      <conduit-home name="home" current-user="[[currentUser.user]]"
+        authentication-header="[[authenticationHeader]]"></conduit-home>
 
       <conduit-settings name="settings" user="{{currentUser.user}}" token="{{token}}"></conduit-settings>
 
