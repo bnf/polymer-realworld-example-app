@@ -44,11 +44,19 @@
               <img src="[[user.image]]" class="user-img" alt="[[user.username]]"/>
               <h4>[[user.username]]</h4>
               <p>[[user.bio]]</p>
-              <button class="btn btn-sm btn-outline-secondary action-btn">
-                <i class="ion-plus-round"></i>
-                &nbsp;
-                Follow [[user.username]]
-              </button>
+
+              <template is="dom-if" if="[[!isOwner]]">
+                <button class="btn btn-sm btn-outline-secondary action-btn">
+                  <i class="ion-plus-round"></i>
+                  &nbsp;
+                  Follow [[user.username]]
+                </button>
+              </template>
+              <template is="dom-if" if="[[isOwner]]">
+                <a class="btn btn-sm btn-outline-secondary action-btn" href="/#/settings">
+                  <i class="ion-gear-a"></i> Edit Profile Settings
+                </a>
+              </template>
             </div>
           </div>
         </div>
@@ -119,6 +127,14 @@
           articles: {
             type: Array
           },
+          currentUser: {
+            type: Object
+          },
+          isOwner: {
+            type: Boolean,
+            value: false,
+            computed: 'computeIsOwner(user, currentUser)',
+          },
         };
       }
       handleArticlesResponse(data) {
@@ -153,6 +169,12 @@
           return 'nav-link active';
         }
         return 'nav-link';
+      }
+      computeIsOwner(user, currentUser) {
+        if (currentUser === undefined || !user || !('username' in user))
+          return false;
+
+        return user.username === currentUser.username;
       }
     }
 
