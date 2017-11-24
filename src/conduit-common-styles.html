@@ -7,6 +7,31 @@
     <style include="conduit-icon-styles conduit-demo-styles">
       :root {
         box-sizing: border-box !important;
+        --conduit-green: #5CB85C;
+        --conduit-font-family: "Source Sans Pro", sans-serif;
+      }
+
+      paper-tabs {
+        --paper-tabs-selection-bar-color: var(--conduit-green);
+      }
+      paper-tab {
+        --paper-tab-ink: var(--conduit-green);
+        --paper-font-common-base: {
+          font-family: var(--conduit-font-family);
+        }
+        --paper-tab: {
+          flex: 0 0 auto;
+          font-size: 1rem;
+        }
+        --paper-tab-content: {
+          padding-left: 1em;
+          padding-right: 1em;
+          color: var(--conduit-green);
+        }
+        --paper-tab-content-unselected: {
+          color: #555;
+          opacity: 0.5;
+        }
       }
     </style>
   </template>
