@@ -1,8 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/pagination-input/pagination-input.html">
-<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
-<link rel="import" href="conduit-article-preview.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="conduit-article-list.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-home">
@@ -10,12 +9,8 @@
     <style include="conduit-common-styles">
     </style>
 
-    <iron-ajax auto
-      url="[[articlesUrl]]"
-      handle-as="json"
-      headers="[[authenticationHeader]]"
-      on-response="handleArticlesResponse"></iron-ajax>
-    <iron-ajax auto
+    <iron-ajax
+      auto="[[visible]]"
       url="https://conduit.productionready.io/api/tags"
       handle-as="json"
       last-response="{{tagsResponse}}"></iron-ajax>
@@ -33,21 +28,28 @@
         <div class="row">
 
           <div class="col-md-9">
-            <div class="feed-toggle">
-              <ul class="nav nav-pills outline-active">
-                <li class="nav-item">
-                  <a class="nav-link disabled" href="">Your Feed</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link active" href="">Global Feed</a>
-                </li>
-              </ul>
-            </div>
+            <!-- TODO: show your-feed tab when we have a token, but hide it, if that token is invalid
+              (once that information is available). Reason: reduce initial flash. -->
+            <paper-tabs id="article-tabs" selected="{{selectedTab}}" attr-for-selected="tab-name" fallback-selection="global-feed">
+              <paper-tab tab-name="your-feed" hidden$="[[!isAuthenticated]]">Your Feed</paper-tab>
+              <paper-tab tab-name="global-feed">Global Feed</paper-tab>
+            </paper-tabs>
 
-            <template is="dom-repeat" items="[[articles]]">
-              <conduit-article-preview article="[[item]]"/>
-            </template>
-            <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
+            <iron-pages selected="{{selectedTab}}" attr-for-selected="name" fallback-selection="global-feed">
+              <conduit-article-list
+                load-data="[[visible]]"
+                hidden$="[[!isAuthenticated]]"
+                name="your-feed"
+                suffix="/feed"
+                current-user="[[currentUser]]"
+                authentication-header="[[authenticationHeader]]"></conduit-article-list>
+              <conduit-article-list
+                load-data="[[visible]]"
+                name="global-feed"
+                current-user="[[currentUser]]"
+                authentication-header="[[authenticationHeader]]"></conduit-article-list>
+            </iron-pages>
+
           </div>
 
           <div class="col-md-3">
@@ -80,65 +82,39 @@
             type: Boolean,
             value: false
           },
+          currentUser: {
+            type: Object
+          },
+          isAuthenticated: {
+            type: Boolean,
+            value: false,
+            computed: 'computeIsAuthenticated(currentUser)',
+          },
           authenticationHeader: {
             type: Object
           },
-          articles: {
-            type: Array
-          },
           tags: {
             type: Array
-          },
-          page: {
-            type: Number,
-            value: function () {
-              return 1
-            }
-          },
-          articlesPerPage: {
-            type: Number,
-            value: function () {
-              return 20
-            }
-          },
-          pages: {
-            type: Number,
-            value: function () {
-              return 1
-            }
-          },
-          offset: {
-            type: Number
-          },
-          articlesUrl: {
-            type: String,
-            computed: 'computeArticlesUrl(page, articlesPerPage, visible)'
           },
         }
       }
       static get observers() {
         return [
-          '_onPageChange(page)'
+          '_onIsAuthenticationChange(isAuthenticated)'
         ]
       }
-      _onPageChange(page) {
-        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+      _onIsAuthenticationChange(isAuthenticated) {
+        // Redraw tabs when authentication changes.
+        // Authentication change means we change the hidden
+        // attribute for the you-feed tab (depending on [[isAuthenticated]])
+        // paper-tabs can not autodetect that change, so we need to trigger
+        // a redraw
+        // https://github.com/PolymerElements/paper-tabs/issues/34
+        this.$['article-tabs'].notifyResize();
       }
-      computeArticlesUrl(page, articlesPerPage, visible) {
-        if (!visible) {
-          return null;
-        }
-        return 'https://conduit.productionready.io/api/articles/?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
-      }
-      handleArticlesResponse(data) {
-        if ('articles' in data.detail.response) {
-          this.set('articles', data.detail.response.articles)
-          console.log(this.get('articles'))
-        }
-        if ('articlesCount' in data.detail.response) {
-          this.set('pages', data.detail.response.articlesCount / 10)
-          console.log(this.get('pages'))
-        }
+      computeIsAuthenticated(currentUser) {
+        console.log(currentUser, 'compute is auth');
+        return currentUser && 'username' in currentUser;
       }
     }
 
