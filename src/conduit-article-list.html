@@ -13,12 +13,13 @@
     <iron-ajax
       auto="[[loadData]]"
       url="[[articlesUrl]]"
+      loading="{{loading}}"
       handle-as="json"
       headers="[[authenticationHeader]]"
       on-response="_handleArticlesResponse"></iron-ajax>
 
     <template is="dom-repeat" items="[[articles]]">
-      <conduit-article-preview article="[[item]]"/>
+      <conduit-article-preview article="[[item]]" visible$="[[!loading]]"/>
     </template>
     <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
   </template>
@@ -75,6 +76,17 @@
           },
         }
       }
+      static get observers() {
+        return [
+          '_onPageChange(page)'
+        ]
+      }
+
+      _onPageChange(page) {
+        //Polymer.AppLayout.scroll({ top: 0, behavior: 'smooth' });
+        Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+      }
+
       computeArticlesUrl(page, articlesPerPage, suffix) {
         return 'https://conduit.productionready.io/api/articles' + suffix + '?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
       }
