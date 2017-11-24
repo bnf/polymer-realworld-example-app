@@ -1,12 +1,17 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-article-preview">
   <template>
     <style include="conduit-common-styles">
+      .article-preview-show-false {
+        visibility: hidden;
+      }
     </style>
 
-    <div class="article-preview">
+    <paper-progress indeterminate hidden$="[[visible]]"></paper-progress>
+    <div class$="article-preview article-preview-show-[[visible]]">
       <div class="article-meta">
         <a href="[[rootPath]]#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
         <div class="info">
@@ -47,6 +52,10 @@
         return {
           article: {
             type: Object
+          },
+          visible: {
+            type: Boolean,
+            value: true
           },
         }
       }
