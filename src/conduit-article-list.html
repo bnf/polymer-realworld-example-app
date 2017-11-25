@@ -32,6 +32,10 @@
 
       static get properties() {
         return {
+          hidden: {
+            type: Boolean,
+            value: false
+          },
           visible: {
             type: Boolean,
             value: false
@@ -68,9 +72,13 @@
           },
           articlesUrl: {
             type: String,
-            computed: 'computeArticlesUrl(page, articlesPerPage, suffix)'
+            computed: 'computeArticlesUrl(page, articlesPerPage, suffix, tag, hidden)'
           },
           suffix: {
+            type: String,
+            value: ''
+          },
+          tag: {
             type: String,
             value: ''
           },
@@ -87,8 +95,11 @@
         Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
       }
 
-      computeArticlesUrl(page, articlesPerPage, suffix) {
-        return 'https://conduit.productionready.io/api/articles' + suffix + '?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage;
+      computeArticlesUrl(page, articlesPerPage, suffix, tag, hidden) {
+        if (hidden) {
+          return null;
+        }
+        return 'https://conduit.productionready.io/api/articles' + suffix + '?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage + (tag ? '&tag=' + tag : '');
       }
       _handleArticlesResponse(data) {
         if ('articles' in data.detail.response) {
