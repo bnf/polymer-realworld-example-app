@@ -33,6 +33,7 @@
             <paper-tabs id="article-tabs" selected="{{selectedTab}}" attr-for-selected="tab-name" fallback-selection="global-feed">
               <paper-tab tab-name="your-feed" hidden$="[[!isAuthenticated]]">Your Feed</paper-tab>
               <paper-tab tab-name="global-feed">Global Feed</paper-tab>
+              <paper-tab tab-name="tab-feed" hidden$="[[!filterByTag]]"><i class="ion-pound"></i>&nbsp;[[filterByTag]]</paper-tab>
             </paper-tabs>
 
             <iron-pages selected="{{selectedTab}}" attr-for-selected="name" fallback-selection="global-feed">
@@ -48,6 +49,14 @@
                 name="global-feed"
                 current-user="[[currentUser]]"
                 authentication-header="[[authenticationHeader]]"></conduit-article-list>
+              <conduit-article-list
+                load-data="[[visible]]"
+                hidden$="[[!filterByTag]]"
+                id="feed-tab"
+                name="tab-feed"
+                tag="[[filterByTag]]"
+                current-user="[[currentUser]]"
+                authentication-header="[[authenticationHeader]]"></conduit-article-list>
             </iron-pages>
 
           </div>
@@ -58,7 +67,7 @@
 
               <div class="tag-list">
                 <template is="dom-repeat" items="[[tagsResponse.tags]]">
-                  <a href="" class="tag-pill tag-default">[[item]]</a>
+                  <a href="[[rootPath]]#/" class="tag-pill tag-default" on-click="_filterByTag">[[item]]</a>
                 </template>
               </div>
             </div>
@@ -81,12 +90,20 @@
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
+          selectedTab: {
+            type: String,
+            value: 'global-feed',
+          },
           visible: {
             type: Boolean,
             value: false
           },
           currentUser: {
             type: Object
+          },
+          filterByTag: {
+            type: String,
+            value: '',
           },
           isAuthenticated: {
             type: Boolean,
@@ -103,7 +120,9 @@
       }
       static get observers() {
         return [
-          '_onIsAuthenticationChange(isAuthenticated)'
+          '_onIsAuthenticationChange(isAuthenticated)',
+          '_onFilterByTagChange(filterByTag)',
+          '_onSelectedTabChange(selectedTab)'
         ]
       }
       _onIsAuthenticationChange(isAuthenticated) {
@@ -115,9 +134,24 @@
         // https://github.com/PolymerElements/paper-tabs/issues/34
         this.$['article-tabs'].notifyResize();
       }
+      _onFilterByTagChange(filterByTag) {
+        if (filterByTag) {
+          this.set('selectedTab', 'tab-feed')
+        }
+        this.$['article-tabs'].notifyResize();
+      }
+      _onSelectedTabChange(selectedTab) {
+        if (selectedTab !== 'tab-feed') {
+          this.set('filterByTag', '')
+        }
+      }
       computeIsAuthenticated(currentUser) {
         console.log(currentUser, 'compute is auth');
         return currentUser && 'username' in currentUser;
+      }
+      _filterByTag(e) {
+        this.set('filterByTag', e.model.item)
+        this.$['feed-tab'].page = 1
       }
     }
 
