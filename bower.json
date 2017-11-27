@@ -12,6 +12,7 @@
     "app-storage": "PolymerElements/app-storage#^2.0.2",
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "paper-progress": "PolymerElements/paper-progress#^2.0.1",
+    "paper-chip": "fabbricadigitale/paper-chip#feature/issue-50",
     "pagination-input": "cforgeard/pagination-input#^1.0.2",
     "juicy-html": "Juicy/juicy-html#^2.0.1"
   },
