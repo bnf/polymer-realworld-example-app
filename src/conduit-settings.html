@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-settings">
@@ -13,28 +14,39 @@
           <div class="col-md-6 offset-md-3 col-xs-12">
             <h1 class="text-xs-center">Your Settings</h1>
 
-            <form>
-              <fieldset>
-                <fieldset class="form-group">
-                  <input class="form-control" type="text" placeholder="URL of profile picture" value="[[user.image]]">
+            <template is="dom-if" if="{{errors}}">
+              <ul class="error-messages">
+                <template is="dom-repeat" items="{{_toArray(errors)}}">
+                  <li>[[item.name]] [[item.value]]</li>
+                </template>
+              </ul>
+            </template>
+
+            <iron-form id="settings-form" on-iron-form-presubmit="_presubmit" headers="[[authenticationHeader]]"
+              on-iron-form-response="_handleFormResponse" on-iron-form-error="_handleErrorResponse">
+              <form action="[[formUrl]]" method="PUT" enctype="application/json">
+                <fieldset>
+                  <fieldset class="form-group">
+                    <input class="form-control" type="text" placeholder="URL of profile picture" name="image" value="[[user.image]]">
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <input class="form-control form-control-lg" type="text" placeholder="Username" name="username" value="[[user.username]]">
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you" name="bio" value="[[user.bio]]"></textarea>
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <input class="form-control form-control-lg" type="text" placeholder="Email" name="email" value="[[user.email]]">
+                  </fieldset>
+                  <fieldset class="form-group">
+                    <input class="form-control form-control-lg" type="password" id="password" name="password" placeholder="New Password">
+                  </fieldset>
+                  <button class="btn btn-lg btn-primary pull-xs-right">
+                    Update Settings
+                  </button>
                 </fieldset>
-                <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="text" placeholder="Username" value="[[user.username]]">
-                </fieldset>
-                <fieldset class="form-group">
-                  <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you">[[user.bio]]</textarea>
-                </fieldset>
-                <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="text" placeholder="Email" value="[[user.email]]">
-                </fieldset>
-                <fieldset class="form-group">
-                  <input class="form-control form-control-lg" type="password" placeholder="New Password">
-                </fieldset>
-                <button class="btn btn-lg btn-primary pull-xs-right">
-                  Update Settings
-                </button>
-              </fieldset>
-            </form>
+              </form>
+            </iron-form>
             <hr>
             <button class="btn btn-outline-danger" on-click="_logout">
               Or click here to logout.
@@ -53,18 +65,66 @@
       }
       static get properties() {
         return {
+          formUrl: {
+            type: String,
+            value: 'https://conduit.productionready.io/api/user'
+          },
+          errors: {
+            type: Object,
+            value: function() { return {}; }
+          },
           user: {
             notify: true, type: Object
           },
           token: {
             notify: true, type: String
-          }
+          },
+          authenticationHeader: {
+            type: Object
+          },
+        }
+      }
+      _presubmit(e) {
+        var body = this.$['settings-form'].request.params;
+
+        if (!body.password) {
+          delete body.password;
+        }
+        if (!body.image) {
+          body.image = null;
+        }
+
+        this.$['settings-form'].request.body = { user: body };
+        this.$['settings-form'].request.params = {};
+      }
+      _handleErrorResponse(e) {
+        if (e.detail.request.response && 'errors' in e.detail.request.response) {
+          this.set('errors', e.detail.request.response.errors)
+        }
+      }
+      _handleFormResponse(e) {
+        if (e.detail.response && 'user' in e.detail.response) {
+          var user = e.detail.response.user;
+
+          this.set('errors', {})
+          this.set('user', user);
+          this.$.password.value = '';
+          window.history.pushState({}, null, '/#/profile/' + user.username);
+          window.dispatchEvent(new CustomEvent('location-changed'));
         }
       }
       _logout() {
         this.set('token', null)
         window.history.pushState({}, null, '/#/');
         window.dispatchEvent(new CustomEvent('location-changed'));
+      }
+      _toArray(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            name: key,
+            value: obj[key]
+          };
+        });
       }
     }
 
