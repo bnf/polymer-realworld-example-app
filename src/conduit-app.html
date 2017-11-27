@@ -47,7 +47,7 @@
                 fallback-selection="404">
       <conduit-home name="home" authentication-header="[[authenticationHeader]]"></conduit-home>
 
-      <conduit-settings name="settings" user="{{currentUser.user}}"></conduit-settings>
+      <conduit-settings name="settings" user="{{currentUser.user}}" token="{{token}}"></conduit-settings>
 
       <conduit-auth name="register" token="{{token}}" route="{{route}}"></conduit-auth>
       <conduit-auth name="login" token="{{token}}" route="{{route}}"></conduit-auth>
@@ -93,6 +93,7 @@
       static get observers() {
         return [
           '_routePageChanged(routeData.page, isAttached)',
+          '_tokenChanged(token)',
         ];
       }
 
@@ -124,6 +125,11 @@
         Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
         // Close the drawer - in case the *route* change came from a link in the drawer.
         //this.$.nav.closeDrawer();
+      }
+      _tokenChanged(token) {
+        if (!token) {
+          this.set('currentUser', null)
+        }
       }
     }
 
