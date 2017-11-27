@@ -1,0 +1,73 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="conduit-common-styles.html">
+
+<dom-module id="conduit-favorite-button">
+  <template>
+    <style include="conduit-common-styles">
+    </style>
+
+    <button id="button" class$="[[buttonClass]]" on-click="_toggleFavorited">
+      <i class="ion-heart"></i>&nbsp;
+      <template is="dom-if" if="[[label]]">
+        [[buttonLabel]] Article <span class="counter">([[article.favoritesCount]])</span>
+      </template>
+      <template is="dom-if" if="[[!label]]">&nbsp;[[article.favoritesCount]]</template>
+    </button>
+  </template>
+
+  <script>
+    class ConduitfavoriteButton extends Polymer.Element {
+      static get is() {
+        return 'conduit-favorite-button';
+      }
+      static get properties() {
+        return {
+          article: {
+            type: Object,
+            notify: true,
+          },
+          label: {
+            type: Boolean,
+            value: false
+          },
+          buttonLabel: {
+            type: String,
+            computed: '_computeButtonLabel(article.favorited)'
+          },
+          buttonClass: {
+            type: String,
+            computed: '_computeButtonClass(article.favorited)'
+          },
+          authenticationHeader: {
+            type: Object
+          },
+        };
+      }
+      _computeButtonLabel(favorited) {
+        return favorited ? 'Unfavorite' : 'Favorite';
+      }
+      _computeButtonClass(favorited) {
+        return ['btn', 'btn-sm', (favorited ? 'btn-primary' : 'btn-outline-primary')].join(' ');
+      }
+      _toggleFavorited() {
+        var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+        this.$.button.disabled = true;
+
+        request.send({
+          url: ['https://conduit.productionready.io/api/articles', this.article.slug, 'favorite'].join('/'),
+          method: this.article.favorited ? 'DELETE' : 'POST',
+          headers: this.authenticationHeader,
+          handleAs: 'json'
+        }).then(r => {
+          this.$.button.disabled = false;
+          if ('article' in r.response) {
+            this.set('article', r.response.article);
+          }
+        });
+      }
+    }
+
+    window.customElements.define(ConduitfavoriteButton.is, ConduitfavoriteButton);
+  </script>
+</dom-module>
