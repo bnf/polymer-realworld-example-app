@@ -19,7 +19,7 @@
       on-response="_handleArticlesResponse"></iron-ajax>
 
     <template is="dom-repeat" items="[[articles]]">
-      <conduit-article-preview article="[[item]]" visible$="[[!loading]]"/>
+      <conduit-article-preview article="[[item]]" visible$="[[!loading]]" authentication-header="[[authenticationHeader]]"></conduit-article-preview>
     </template>
     <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
   </template>

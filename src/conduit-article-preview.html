@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="conduit-common-styles.html">
+<link rel="import" href="conduit-favorite-button.html">
 
 <dom-module id="conduit-article-preview">
   <template>
@@ -18,16 +19,7 @@
           <a href="[[rootPath]]#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
           <span class="date">[[article.createdAt]]</span>
         </div>
-        <template is="dom-if" if="[[article.favorited]]">
-          <button class="btn btn-primary btn-sm pull-xs-right">
-            <i class="ion-heart"></i> [[article.favoritesCount]]
-          </button>
-        </template>
-        <template is="dom-if" if="[[!article.favorited]]">
-          <button class="btn btn-outline-primary btn-sm pull-xs-right">
-            <i class="ion-heart"></i> [[article.favoritesCount]]
-          </button>
-        </template>
+        <conduit-favorite-button article="{{article}}" authentication-header="[[authenticationHeader]]" class="pull-xs-right"></conduit-favorite-button>
       </div>
       <a href="[[rootPath]]#/article/[[article.slug]]" class="preview-link">
         <h1>[[article.title]]</h1>
@@ -56,6 +48,9 @@
           visible: {
             type: Boolean,
             value: true
+          },
+          authenticationHeader: {
+            type: Object
           },
         }
       }
