@@ -2,11 +2,20 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-chip/paper-chip-input.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-editor">
   <template>
     <style include="conduit-common-styles">
+      paper-chip-input {
+        padding: 0.1rem 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 0.25rem;
+      }
+      paper-chip-input:focus {
+        border-color: #66afe9;
+      }
     </style>
 
     <app-route
@@ -48,8 +57,7 @@
                     <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)" name="body" value="[[article.body]]"></textarea>
                   </fieldset>
                   <fieldset class="form-group">
-                    <input type="text" class="form-control" placeholder="Enter tags" name="tagList" value="[[_join(article.tagList)]]">
-                    <div class="tag-list"></div>
+                    <paper-chip-input id="tags" no-label-float noline label="Enter tags" name="tagList" values="[[article.tagList]]"><input></paper-chip-input>
                   </fieldset>
                   <button class="btn btn-lg pull-xs-right btn-primary" type="submit">
                     Publish Article
@@ -162,7 +170,10 @@
           body = form.request.params;
         }
 
-        body.tagList = body.tagList.split(' ');
+        /* <iron-form> does not have support for <paper-chip-input>,
+         * manually add those values to the body */
+        body.tagList = this.$.tags.values;
+
         form.request.params = {};
         form.request.body = { article: body };
         console.log(body);
@@ -200,12 +211,6 @@
             value: obj[key]
           };
         });
-      }
-      _join(tags) {
-        if (tags) {
-          return tags.join(' ');
-        }
-        return '';
       }
     }
 
