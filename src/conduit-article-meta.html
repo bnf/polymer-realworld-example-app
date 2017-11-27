@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="conduit-follow-button.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-article-meta">
@@ -23,11 +24,7 @@
       </div>
 
       <template is="dom-if" if="[[!isOwner]]">
-        <button class="btn btn-sm btn-outline-secondary">
-          <i class="ion-plus-round"></i>
-          &nbsp;
-          Follow [[article.author.username]]
-        </button>
+        <conduit-follow-button user="{{article.author}}" authentication-header="[[authenticationHeader]]"></conduit-follow-button>
         &nbsp;
         <button class="btn btn-sm btn-outline-primary">
           <i class="ion-heart"></i>
@@ -54,6 +51,7 @@
         return {
           article: {
             type: Object,
+            notify: true,
             value: function () {
               return {}
             }

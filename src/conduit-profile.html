@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="conduit-article-preview.html">
+<link rel="import" href="conduit-follow-button.html">
 <link rel="import" href="conduit-common-styles.html">
 
 <dom-module id="conduit-profile">
@@ -17,10 +18,12 @@
     <iron-ajax auto
       url="[[profileUrl]]"
       handle-as="json"
+      headers="[[authenticationHeader]]"
       on-response="handleProfileResponse"></iron-ajax>
     <iron-ajax auto
       url="[[articlesUrl]]"
       handle-as="json"
+      headers="[[authenticationHeader]]"
       on-response="handleArticlesResponse"></iron-ajax>
 
     <template is="dom-if" if="[[!user.username]]">
@@ -46,11 +49,7 @@
               <p>[[user.bio]]</p>
 
               <template is="dom-if" if="[[!isOwner]]">
-                <button class="btn btn-sm btn-outline-secondary action-btn">
-                  <i class="ion-plus-round"></i>
-                  &nbsp;
-                  Follow [[user.username]]
-                </button>
+                <conduit-follow-button user="{{user}}" authentication-header="[[authenticationHeader]]"></conduit-follow-button>
               </template>
               <template is="dom-if" if="[[isOwner]]">
                 <a class="btn btn-sm btn-outline-secondary action-btn" href="[[rootPath]]#/settings">
@@ -128,6 +127,9 @@
             type: Array
           },
           currentUser: {
+            type: Object
+          },
+          authenticationHeader: {
             type: Object
           },
           isOwner: {
