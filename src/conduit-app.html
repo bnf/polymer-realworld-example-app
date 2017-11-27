@@ -48,7 +48,8 @@
       <conduit-home name="home" current-user="[[currentUser.user]]"
         authentication-header="[[authenticationHeader]]"></conduit-home>
 
-      <conduit-settings name="settings" user="{{currentUser.user}}" token="{{token}}"></conduit-settings>
+      <conduit-settings name="settings" user="{{currentUser.user}}" token="{{token}}"
+        authentication-header="[[authenticationHeader]]"></conduit-settings>
 
       <conduit-auth name="register" token="{{token}}" route="{{route}}"></conduit-auth>
       <conduit-auth name="login" token="{{token}}" route="{{route}}"></conduit-auth>
