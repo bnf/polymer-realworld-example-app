@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="conduit-common-styles.html">
+
+<dom-module id="conduit-follow-button">
+  <template>
+    <style include="conduit-common-styles">
+    </style>
+
+    <button id="button" class="btn btn-sm action-btn btn-outline-secondary" on-click="_toggleFollowing">
+      <i class="ion-plus-round"></i> [[buttonLabel]] [[user.username]]
+    </button>
+  </template>
+
+  <script>
+    class ConduitFollowButton extends Polymer.Element {
+      static get is() {
+        return 'conduit-follow-button';
+      }
+      static get properties() {
+        return {
+          user: {
+            type: Object,
+            notify: true,
+          },
+          buttonLabel: {
+            type: String,
+            computed: '_computeButtonLabel(user.following)'
+          },
+          authenticationHeader: {
+            type: Object
+          },
+        };
+      }
+      _computeButtonLabel(following) {
+        return following ? 'Unfollow' : 'Follow';
+      }
+      _toggleFollowing() {
+        var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+        this.$.button.disabled = true;
+
+        request.send({
+          url: ['https://conduit.productionready.io/api/profiles', this.user.username, 'follow'].join('/'),
+          method: this.user.following ? 'DELETE' : 'POST',
+          headers: this.authenticationHeader,
+          handleAs: 'json'
+        }).then(r => {
+          this.$.button.disabled = false;
+          if ('profile' in r.response) {
+            this.set('user', r.response.profile);
+          }
+        });
+      }
+    }
+
+    window.customElements.define(ConduitFollowButton.is, ConduitFollowButton);
+  </script>
+</dom-module>

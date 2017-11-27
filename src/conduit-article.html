@@ -42,7 +42,7 @@
           <template is="dom-if" if="[[!article.slug]]">
             <h1>Loading…</h1>
           </template>
-          <conduit-article-meta article="[[article]]" is-owner="[[isOwner]]" authentication-header="[[authenticationHeader]]"></conduit-article-meta>
+          <conduit-article-meta article="{{article}}" is-owner="[[isOwner]]" authentication-header="[[authenticationHeader]]"></conduit-article-meta>
         </div>
       </div>
 
@@ -64,7 +64,7 @@
         <hr/>
 
         <div class="article-actions">
-          <conduit-article-meta article="[[article]]" is-owner="[[isOwner]]" authentication-header="[[authenticationHeader]]"></conduit-article-meta>
+          <conduit-article-meta article="{{article}}" is-owner="[[isOwner]]" authentication-header="[[authenticationHeader]]"></conduit-article-meta>
         </div>
 
         <div class="row">
