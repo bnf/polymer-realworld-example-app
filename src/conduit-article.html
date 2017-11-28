@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-request.html">
 <link rel="import" href="../bower_components/juicy-html/juicy-html.html">
 <link rel="import" href="conduit-article-meta.html">
 <link rel="import" href="conduit-common-styles.html">
@@ -119,6 +120,12 @@
                   &nbsp;
                   <a href="/#/profile/[[item.author.username]]" class="comment-author">[[item.author.username]]</a>
                   <span class="date-posted">[[item.createdAt]]</span>
+
+                  <template is="dom-if" if="[[_isOwnerOfComment(currentUser.username, item.author.username)]]">
+                    <span class="mod-options" on-click="_deleteComment">
+                      <i class="ion-trash-a"></i>
+                    </span>
+                  </template>
                 </div>
               </div>
             </template>
@@ -230,6 +237,23 @@
           return false;
 
         return article.author.username === currentUser.username;
+      }
+      _isOwnerOfComment(username, commentAuthor) {
+        if (!username || !commentAuthor) return false;
+        return username == commentAuthor;
+      }
+      _deleteComment(e) {
+        var comment = e.model.item;
+        var request = /** @type {!IronRequestElement} */ (document.createElement('iron-request'));
+        request.send({
+          url: ['https://conduit.productionready.io/api/articles', this.routeData.slug, 'comments', comment.id].join('/'),
+          method: 'DELETE',
+          headers: this.authenticationHeader,
+          handleAs: 'json'
+        }).then(r => {
+          var index = this.comments.indexOf(comment);
+          this.splice('comments', index, 1);
+        });
       }
       _toArray(obj) {
         return Object.keys(obj).map(function(key) {
