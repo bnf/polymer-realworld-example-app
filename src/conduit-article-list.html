@@ -84,7 +84,7 @@
           console.log(this.get('articles'))
         }
         if ('articlesCount' in data.detail.response) {
-          this.set('pages', Math.ceil(data.detail.response.articlesCount / 10))
+          this.set('pages', Math.ceil(data.detail.response.articlesCount / this.articlesPerPage))
           console.log(this.get('pages'))
         }
       }
