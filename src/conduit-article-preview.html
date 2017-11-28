@@ -17,7 +17,7 @@
         <a href="[[rootPath]]#/profile/[[article.author.username]]"><img src="[[article.author.image]]"/></a>
         <div class="info">
           <a href="[[rootPath]]#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
-          <span class="date">[[article.createdAt]]</span>
+          <span class="date">[[_formatDate(article.createdAt)]]</span>
         </div>
         <conduit-favorite-button article="{{article}}" authentication-header="[[authenticationHeader]]" class="pull-xs-right"></conduit-favorite-button>
       </div>
@@ -53,6 +53,12 @@
             type: Object
           },
         }
+      }
+      _formatDate(dateString) {
+        if (!dateString)
+          return '';
+        var date = new Date(dateString);
+        return date.toLocaleString("en-us", {day: 'numeric', month: 'long', year: 'numeric'});
       }
     }
 

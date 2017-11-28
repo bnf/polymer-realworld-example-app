@@ -21,7 +21,7 @@
       </a>
       <div class="info">
         <a href="[[rootPath]]#/profile/[[article.author.username]]" class="author">[[article.author.username]]</a>
-        <span class="date">[[article.createdAt]]</span>
+        <span class="date">[[_formatDate(article.createdAt)]]</span>
       </div>
 
       <template is="dom-if" if="[[!isOwner]]">
@@ -76,6 +76,12 @@
           window.history.pushState({}, null, this.rootPath + '#/');
           window.dispatchEvent(new CustomEvent('location-changed'));
         });
+      }
+      _formatDate(dateString) {
+        if (!dateString)
+          return '';
+        var date = new Date(dateString);
+        return date.toLocaleString("en-us", {day: 'numeric', month: 'long', year: 'numeric'});
       }
     }
 
