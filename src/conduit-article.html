@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../bower_components/juicy-html/juicy-html.html">
 <link rel="import" href="conduit-article-meta.html">
 <link rel="import" href="conduit-common-styles.html">
@@ -72,21 +73,36 @@
           <div class="col-xs-12 col-md-8 offset-md-2">
 
             <template is="dom-if" if="[[currentUser.username]]">
-              <form class="card comment-form">
-                <div class="card-block">
-                  <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
-                </div>
-                <div class="card-footer">
-
-                  <!-- TODO: we need to fetch the image from the current user's profile -->
-                  <template is="dom-if" if="[[currentUser.image]]">
-                    <img src="[[currentUser.image]]" class="comment-author-img"/>
+              <template is="dom-if" if="{{errors}}">
+                <ul class="error-messages">
+                  <template is="dom-repeat" items="{{_toArray(errors)}}">
+                    <li>[[item.name]] [[item.value]]</li>
                   </template>
-                  <button class="btn btn-sm btn-primary">
-                    Post Comment
-                  </button>
-                </div>
-              </form>
+                </ul>
+              </template>
+
+              <iron-form id="comment-form" on-iron-form-presubmit="_presubmitComment" headers="[[authenticationHeader]]"
+                on-iron-form-response="_handleCommentFormResponse" on-iron-form-error="_handleCommentErrorResponse">
+                <form action="[[commentsUrl]]" method="POST" enctype="application/json" class="card comment-form">
+                  <div class="card-block">
+                    <textarea name="body" id="comment-body" class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+                  </div>
+                  <div class="card-footer">
+
+                    <!-- TODO: we need to fetch the image from the current user's profile -->
+                    <template is="dom-if" if="[[currentUser.image]]">
+                      <img src="[[currentUser.image]]" class="comment-author-img"/>
+                    </template>
+                    <button class="btn btn-sm btn-primary">
+                      Post Comment
+                    </button>
+                  </div>
+                </form>
+              </iron-form>
+            </template>
+
+            <template is="dom-if" if="[[!currentUser.username]]">
+              <p><a href="[[rootPath]]#/login">Sign in</a> or <a href="[[rootPath]]#/register">sign up</a> to add comments on this article.</p>
             </template>
 
             <template is="dom-repeat" items="[[comments]]">
@@ -128,7 +144,8 @@
             type: Object
           },
           currentUser: {
-            type: Object
+            type: Object,
+            value: {}
           },
           authenticationHeader: {
             type: Object
@@ -161,7 +178,10 @@
             value: false,
             computed: 'computeIsOwner(article, currentUser)',
           },
-
+          errors: {
+            type: Object,
+            value: function() { return {}; }
+          },
         };
       }
       _handleArticleResponse(data) {
@@ -176,6 +196,27 @@
         }
         console.log(data.detail.response)
       }
+      _presubmitComment(e) {
+        var form = this.shadowRoot.querySelector('#comment-form')
+        var body = form.request.body;
+
+        form.request.body = { comment: body };
+      }
+      _handleCommentFormResponse(e) {
+        if (e.detail.response && 'comment' in e.detail.response) {
+          var comment = e.detail.response.comment;
+          this.unshift('comments', comment);
+
+          this.set('errors', {})
+          this.shadowRoot.querySelector('#comment-body').value = ''
+        }
+        console.log(e.detail.response)
+      }
+      _handleCommentErrorResponse(e) {
+        if (e.detail.request.response && 'errors' in e.detail.request.response) {
+          this.set('errors', e.detail.request.response.errors)
+        }
+      }
       _computeArticleUrl(visible, slug) {
         if (!visible) return null;
         return 'https://conduit.productionready.io/api/articles/' + slug;
@@ -189,6 +230,14 @@
           return false;
 
         return article.author.username === currentUser.username;
+      }
+      _toArray(obj) {
+        return Object.keys(obj).map(function(key) {
+          return {
+            name: key,
+            value: obj[key]
+          };
+        });
       }
     }
 
