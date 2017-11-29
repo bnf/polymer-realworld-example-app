@@ -38,7 +38,7 @@
                     <i class="ion-heart"></i> [[item.favoritesCount]]
                   </button>
                 </div>
-                <a href="/#/article/[[item.slug]]" class="preview-link">
+                <a href="[[rootPath]]#/article/[[item.slug]]" class="preview-link">
                   <h1>[[item.title]]</h1>
                   <p>[[item.description]]</p>
                   <span>Read more...</span>
@@ -80,6 +80,9 @@
           tags: {
             type: Array
           }
+          // This shouldn't be neccessary, but the Analyzer isn't picking up
+          // Polymer.Element#rootPath
+          rootPath: String,
         }
       }
     }

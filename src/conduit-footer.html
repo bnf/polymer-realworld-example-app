@@ -4,7 +4,7 @@
   <template>
     <footer>
       <div class="container">
-        <a href="/#/" class="logo-font">conduit</a>
+        <a href="[[rootPath]]#/" class="logo-font">conduit</a>
         <span class="attribution">
           An interactive learning project from <a href="https://thinkster.io">Thinkster</a>. Code &amp; design licensed under MIT.
         </span>
@@ -16,6 +16,13 @@
     class ConduitFooter extends Polymer.Element {
       static get is() {
         return 'conduit-footer';
+      }
+      static get properties() {
+        return {
+          // This shouldn't be neccessary, but the Analyzer isn't picking up
+          // Polymer.Element#rootPath
+          rootPath: String,
+        };
       }
     }
 
