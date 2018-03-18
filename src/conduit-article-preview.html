@@ -9,6 +9,15 @@
       .article-preview-show-false {
         visibility: hidden;
       }
+      .read-more-tag-list-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .read-more-tag-list-wrapper .tag-list {
+        margin-bottom: 0;
+      }
     </style>
 
     <paper-progress indeterminate hidden$="[[visible]]"></paper-progress>
@@ -24,12 +33,14 @@
       <a href="[[rootPath]]#/article/[[article.slug]]" class="preview-link">
         <h1>[[article.title]]</h1>
         <p>[[article.description]]</p>
-        <ul class="tag-list">
-          <template is="dom-repeat" items="[[article.tagList]]">
-            <li class="tag-pill tag-default tag-outline">[[item]]</a>
-          </template>
-        </ul>
-        <span>Read more...</span>
+        <div class="read-more-tag-list-wrapper">
+          <span>Read more...</span>
+          <ul class="tag-list">
+            <template is="dom-repeat" items="[[article.tagList]]">
+              <li class="tag-pill tag-default tag-outline">[[item]]</a>
+            </template>
+          </ul>
+        </div>
       </a>
     </div>
   </template>
