@@ -16,12 +16,20 @@
       loading="{{loading}}"
       handle-as="json"
       headers="[[authenticationHeader]]"
-      on-response="_handleArticlesResponse"></iron-ajax>
+      last-error="{{lastError}}"
+      on-response="_handleArticlesResponse"
+      on-error="_handleArticlesError"
+      ></iron-ajax>
 
     <template is="dom-repeat" items="[[articles]]">
       <conduit-article-preview article="[[item]]" visible$="[[!loading]]" authentication-header="[[authenticationHeader]]"></conduit-article-preview>
     </template>
+    <p hidden$="[[!lastError]]">
+      <br>
+      [[_parseError(lastError)]]
+    </p>
     <pagination-input current-page="{{page}}" page-count="[[pages]]"></pagination-input>
+
   </template>
 
   <script>
@@ -32,6 +40,7 @@
 
       static get properties() {
         return {
+          lastError: Object,
           hidden: {
             type: Boolean,
             value: false
@@ -101,6 +110,16 @@
         }
         return 'https://conduit.productionready.io/api/articles' + suffix + '?offset=' + ((page - 1) * articlesPerPage) + '&limit=' + articlesPerPage + (tag ? '&tag=' + tag : '');
       }
+      _handleArticlesError(e) {
+        console.log(this.lastError)
+        console.log(e)
+        console.log(e.detail)
+        console.log(e.detail.respo)
+        console.log(e.detail.response)
+        console.log(e.detail.error)
+        console.log(e.detail.error.status)
+        console.log(e.detail.status)
+      }
       _handleArticlesResponse(data) {
         if ('articles' in data.detail.response) {
           this.set('articles', data.detail.response.articles)
@@ -110,6 +129,10 @@
           this.set('pages', Math.ceil(data.detail.response.articlesCount / this.articlesPerPage))
           console.log(this.get('pages'))
         }
+      }
+      _parseError(error) {
+        if (!error) return;
+        return 'Failed to load articles.';
       }
     }
 
